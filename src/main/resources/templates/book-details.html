@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<!--
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
+-->
+<html xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="ISO-8859-1">
+  <title>Book-Details</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="container">
+  <div class="row">
+    <h1>You current view:&nbsp;<h1 th:text="${book.title}"></h1></h1>
+  </div>
+  <form id="myForm" th:object="${book}" th:method="PUT" enctype="multipart/form-data" class="row">
+    <fieldset disabled class="col-6">
+      <div class="form-row">
+        <div class="form-group col">
+          <label class="control-label" for="title"> Title </label>
+          <input id="title" type="text" name="title" class="form-control" th:value="*{title}">
+          <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+        </div>
+        <div class="form-group col">
+          <label class="control-label" for="author"> Author </label>
+          <input id="author" type="text" name="author" class="form-control" th:value="*{author}">
+          <p th:if="${#fields.hasErrors('author')}" th:errors="*{author}"></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="category"> Category </label>
+        <input id="category" type="text" name="category" class="form-control" th:value="*{category}">
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="category"> Price </label>
+        <input id="price" type="number" name="price" class="form-control" th:value="*{price}">
+      </div>
+      <div class="form-row">
+        <div class="form-group col">
+          <label class="control-label" for="releaseDate"> ReleaseDate </label>
+          <input id="releaseDate" type="date" name="releaseDate" class="form-control"
+                 th:value="*{releaseDate}">
+          <p th:if="${#fields.hasErrors('releaseDate')}">Khong duoc de trong</p>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="col-6">
+      <fieldset disabled>
+        <div class="form-group">
+          <label class="control-label" for="cover"> Cover </label>
+          <input sec:authorize="hasRole('ROLE_ADMIN')" id="cover" type="file" name="imgcover" class="form-control-file"
+                 accept="image/png, image/jpeg" onchange="preview()">
+          <img sec:authorize="hasRole('ROLE_ADMIN')" id="frame" src="" />
+        </div>
+      </fieldset>
+      <img class="img-thumbnail" th:src="@{${book.imgCover} }">
+    </div>
+  </form>
+</div>
+<div class="container" sec:authorize="hasRole('ROLE_ADMIN')" th:switch="${id}">
+  <input class="btn btn-secondary" th:case="-1" type="submit" value="Add" form="myForm">
+  <button class="btn btn-secondary" th:case="*" type="button" onclick="myFunction()" id="editSave">Edit</button>
+</div>
+<script>
+  function myFunction() {
+    document.getElementsByTagName("fieldset")[0].disabled = false;
+    document.getElementsByTagName("fieldset")[1].disabled = false;
+    var x = document.getElementById("editSave");
+    x.innerHTML = "Save";
+    setTimeout(() => {
+      x.setAttribute("type", "submit");
+      x.setAttribute("form", "myForm");
+    }, 50);
+  }
+
+  function preview() {
+    frame.src = URL.createObjectURL(event.target.files[0]);
+  }
+</script>
+
+<!--<script th:if="*{id} == -1">-->
+<!--    document.getElementsByTagName("fieldset")[0].disabled = false;-->
+<!--    document.getElementsByTagName("fieldset")[1].disabled = false;-->
+
+<!--</script>-->
+</body>
+
+</html>
