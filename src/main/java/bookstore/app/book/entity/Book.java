@@ -1,14 +1,21 @@
 package bookstore.app.book.entity;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.lang.String;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Book")
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 public class Book {
 
     @Id
@@ -24,22 +31,24 @@ public class Book {
     @NotBlank(message = "not blank book author")
     private String author;
 
-    @Column(name = "category")
-    private String category;
 
     @Column(name = "release_date")
-    private String releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
 
     @Column(name = "img_cover", nullable = true)
     private String imgCover;
 
+    @ManyToOne
+    @JsonIgnoreProperties(value = {"books"},allowSetters = true)
+    private Category category;
+
     @Transient
     public String getImgCover(){
         if(this.imgCover == null) return null;
-        return "/data/coverImg" + this.imgCover;
+        return "/data/" + this.id + "/" + this.imgCover;
     }
 
 }

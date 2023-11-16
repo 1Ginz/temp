@@ -1,28 +1,37 @@
 package bookstore.app.book.service.impl;
 
 import bookstore.app.book.dto.BookDto;
+import bookstore.app.book.dto.CategoryDto;
 import bookstore.app.book.entity.Book;
+import bookstore.app.book.entity.Category;
 import bookstore.app.book.repository.BookRepository;
+import bookstore.app.book.repository.CategoryRepository;
 import bookstore.app.book.service.IBookService;
 import bookstore.app.book.service.mapper.IConverterDto;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import bookstore.app.book.service.mapper.impl.CategoryMapper;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BookService implements IBookService {
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
 
-    private IConverterDto<Book, BookDto> bookMapper;
+    private final IConverterDto<Book, BookDto> bookMapper;
+
+    private final CategoryRepository categoryRepository;
+
+
 
     public BookService(BookRepository bookRepository,
-                       IConverterDto<Book, BookDto> bookMapper){
+                       IConverterDto<Book, BookDto> bookMapper,
+                       CategoryRepository categoryRepository){
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -31,20 +40,23 @@ public class BookService implements IBookService {
     }
 
     @Override
-    public Collection<BookDto> getAll(Pageable pageable){
-        return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findAll(pageable).getContent());
+    public Page<BookDto> getAll(Pageable pageable){
+        Page<Book> bookPage = bookRepository.findAll(pageable);
+        List<BookDto> bookDtoList = (List<BookDto>) bookMapper.convertToListDto(bookPage.getContent());
+        return new PageImpl<BookDto>(bookDtoList, pageable, bookPage.getTotalElements());
+
     }
 
-    public List<BookDto> getAllBookBySort(String sortBy,String typeSort){
-        if (sortBy == null) return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findAll());
-        Sort sort;
-        if(typeSort.equals("ASC")){
-            sort = Sort.by(Sort.Direction.ASC,sortBy);
-        }else{
-            sort = Sort.by(Sort.Direction.DESC,sortBy);
-        }
-        return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findAll(sort));
-    }
+//    public List<BookDto> getAllBookBySort(String sortBy,String typeSort){
+//        if (sortBy == null) return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findAll());
+//        Sort sort;
+//        if(typeSort.equals("ASC")){
+//            sort = Sort.by(Sort.Direction.ASC,sortBy);
+//        }else{
+//            sort = Sort.by(Sort.Direction.DESC,sortBy);
+//        }
+//        return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findAll(sort));
+//    }
 
     @Override
     public BookDto getById(Long id){
@@ -57,11 +69,19 @@ public class BookService implements IBookService {
         return (BookDto) bookMapper.convertToDto(book);
     }
 
+    @Override
+    public List<BookDto> getByCategory(String id){
+        Category category = categoryRepository.getById(Long.valueOf(id));
+        return (List<BookDto>) bookMapper.convertToListDto(bookRepository.findByCategory(category));
+    }
+
 
     @Override
-    public BookDto create(BookDto book){
-        bookRepository.save(bookMapper.convertToEntity(book));
-        return book;
+    public BookDto create(BookDto bookDto){
+        Book book = bookMapper.convertToEntity(bookDto);
+        Book result = bookRepository.save(book);
+        bookDto = bookMapper.convertToDto(result);
+        return bookDto;
     }
 
     @Override
@@ -81,6 +101,13 @@ public class BookService implements IBookService {
         }
         bookRepository.deleteById(id);
         return true;
+    }
+
+    @Override
+    public List<BookDto> searchBook(String param){
+       Set<Book> total = bookRepository.searchBook(param);
+       List<Book> ans = new ArrayList<>(total);
+       return (List<BookDto>) bookMapper.convertToListDto(total);
     }
 
 

@@ -7,8 +7,11 @@ package bookstore.app.book.config;
 //import com.shop.bookshop.Service.mapper.impl.BookMapper;
 //import com.shop.bookshop.Service.mapper.impl.UserMapper;
 import bookstore.app.book.dto.BookDto;
+import bookstore.app.book.dto.CategoryDto;
 import bookstore.app.book.entity.Book;
+import bookstore.app.book.entity.Category;
 import bookstore.app.book.service.mapper.impl.BookMapper;
+import bookstore.app.book.service.mapper.impl.CategoryMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,4 +30,8 @@ public class ApplicationCustomeRegisterBean {
 //    public UserMapper getUserMapper(){
 //        return new UserMapper(User.class, UserDto.class);
 //    }
+    @Bean(name = "categoryMapper")
+    public CategoryMapper getCategoryMapper(){
+        return new CategoryMapper(Category.class, CategoryDto.class);
+    }
 }

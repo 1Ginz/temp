@@ -1,5 +1,7 @@
 package bookstore.app.book.service;
 
+import bookstore.app.book.dto.BookDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collection;
@@ -13,5 +15,5 @@ public interface IServiceAdapter<T> {
     boolean deleteById(Long id) throws Exception;
     Collection<T> getAll();
 
-    Collection<T> getAll(Pageable pageable);
+    Page<T> getAll(Pageable pageable);
 }
