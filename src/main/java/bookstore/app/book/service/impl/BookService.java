@@ -11,6 +11,7 @@ import bookstore.app.book.service.mapper.IConverterDto;
 import bookstore.app.book.service.mapper.impl.CategoryMapper;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,6 +91,12 @@ public class BookService implements IBookService {
             create(book);
             return book;
         }
+        StringBuilder newAvatar = new StringBuilder("/data/book/");
+        newAvatar.append(book.getId());
+        newAvatar.append("/");
+        newAvatar.append(book.getImgCover());
+        book.setImgCover(newAvatar.toString());
+        System.out.println(book.getImgCover());
         bookRepository.save(bookMapper.convertToEntity(book));
         return book;
     }
@@ -106,8 +113,11 @@ public class BookService implements IBookService {
     @Override
     public List<BookDto> searchBook(String param){
        Set<Book> total = bookRepository.searchBook(param);
-       List<Book> ans = new ArrayList<>(total);
        return (List<BookDto>) bookMapper.convertToListDto(total);
+    }
+
+    private void UploadImage(MultipartFile multipartFile){
+
     }
 
 

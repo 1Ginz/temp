@@ -22,7 +22,7 @@ public class Category {
     private String name;
 
     @OneToMany(mappedBy = "category",cascade = CascadeType.REMOVE)
-    @JsonIgnoreProperties(value = {"category"},allowSetters = true)
+    @JsonIgnoreProperties(value = {"category","comments","orderDetails"},allowSetters = true)
     private Set<Book> books;
 
 }

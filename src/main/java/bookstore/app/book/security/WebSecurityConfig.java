@@ -10,8 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Collection;
 
 @Configuration
 @EnableWebSecurity
@@ -35,10 +38,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable();
         http.authorizeRequests()
+                .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/","/registration","../assets/css/**").permitAll()
                 .anyRequest().authenticated().and()
                 .formLogin().loginPage("/login")
-                .defaultSuccessUrl("/").permitAll().and()
+                .defaultSuccessUrl("/",true)
+                .successHandler((request, response, authentication) -> {
+                    Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+                    // Check if the user has ROLE_ADMIN authority
+                    boolean isAdmin = authorities.stream()
+                            .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+
+                    // Redirect based on user authority
+                    if (isAdmin) {
+                        response.sendRedirect("/admin/");
+                    } else {
+                        response.sendRedirect("/");
+                    }
+                })
+                .permitAll().and()
                 .logout().logoutSuccessUrl("/").permitAll();
     }
     @Override

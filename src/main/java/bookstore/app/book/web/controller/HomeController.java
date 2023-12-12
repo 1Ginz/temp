@@ -2,14 +2,20 @@ package bookstore.app.book.web.controller;
 
 import bookstore.app.book.dto.BookDto;
 import bookstore.app.book.dto.CategoryDto;
+import bookstore.app.book.dto.UserDto;
+import bookstore.app.book.entity.Account;
 import bookstore.app.book.entity.Category;
+import bookstore.app.book.entity.User;
+import bookstore.app.book.service.IAccountService;
 import bookstore.app.book.service.IBookService;
 import bookstore.app.book.service.ICategoryService;
+import bookstore.app.book.service.IUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +32,12 @@ public class HomeController {
 
     private final IBookService bookService;
     private final ICategoryService categoryService;
+    private final IUserService userService;
+    private final IAccountService accountService;
 
     @GetMapping("")
     public String getHome(Model model,
+                          Authentication authentication,
                           @RequestParam(name = "pageNumber",required = false) String pageNumber,
                           @RequestParam(name = "limitParam", required = false) String limitParam,
                           @RequestParam(name = "sort_by", required = false, defaultValue = "id") String sortBy,
@@ -36,7 +45,6 @@ public class HomeController {
         int currentPage = pageNumber == null ? 0 : Integer.valueOf(pageNumber);
         int limit = limitParam == null ? 15 : Integer.valueOf(limitParam);
 
-//        if(sortBy != null && typeSort!= null && pageNumber == null) currentPage = 1;
 
         Sort sort;
         if(typeSort.equals("ASC")){
@@ -47,10 +55,6 @@ public class HomeController {
         Pageable pageable = PageRequest.of(currentPage,limit,sort);
 
         Page<BookDto> listBookDto = (Page<BookDto>) bookService.getAll(pageable);
-//        int total = bookService.getAll().size();
-//        int totalPages = total % limit != 0
-//                ? (int) Math.ceil(total / limit)
-//                : total / limit -1;
         System.out.println(listBookDto.getTotalPages());
         model.addAttribute("totalPages",listBookDto.getTotalPages());
         model.addAttribute("pageNumber",currentPage);
@@ -61,22 +65,20 @@ public class HomeController {
 
         List<CategoryDto> category = (List<CategoryDto>) categoryService.getAll();
         model.addAttribute("category",category);
+        if (authentication != null)
+        {
+            Account account = accountService.getByUserName(authentication.getName());
+            User user = account.getUser();
+            model.addAttribute("user",user);
+        }
         System.out.println(currentPage);
         return "home";
     }
 
-//    @GetMapping("/sort")
-//    public String getSortHome(Model model,
-//                              @RequestParam("sort_by") String sortBy,
-//                              @RequestParam("type_sort") String typeSort
-//    ){
-//        List<BookDto> listBookDto = bookService.getAllBookBySort(sortBy,typeSort);
-//        model.addAttribute("books",listBookDto);
-//        return "home";
-//    }
 
     @GetMapping("/search/{search}")
     public String findBook(Model model,
+                           Authentication authentication,
                            @PathVariable("search") String search,
                            @RequestParam(name = "type_sort", required = false) String typeSort
     ){
@@ -98,12 +100,19 @@ public class HomeController {
             );
         }
 
+        if (authentication != null)
+        {
+            Account account = accountService.getByUserName(authentication.getName());
+            User user = account.getUser();
+            model.addAttribute("user",user);
+        }
         model.addAttribute("books",listBookDto);
         return "home";
     }
 
     @GetMapping("/category/{id}")
     public String getBookByCategory(Model model,
+                                    Authentication authentication,
                                     @PathVariable String id,
                                     @RequestParam(name = "sort_by", required = false) String sortBy,
                                     @RequestParam(name = "type_sort", required = false) String typeSort
@@ -122,6 +131,12 @@ public class HomeController {
             listBookDto.sort(
                     (o1,o2) -> o2.getPrice().compareTo(o1.getPrice())
             );
+        }
+        if (authentication != null)
+        {
+            Account account = accountService.getByUserName(authentication.getName());
+            User user = account.getUser();
+            model.addAttribute("user",user);
         }
         model.addAttribute("books",listBookDto);
         return "home";

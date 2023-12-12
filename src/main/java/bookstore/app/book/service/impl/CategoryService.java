@@ -55,7 +55,11 @@ public class CategoryService implements ICategoryService{
 
     @Override
     public boolean deleteById(Long id) throws Exception {
-        return false;
+        if (!categoryRepository.existsById(id)){
+            throw new Exception("ko tim thay id");
+        }
+        categoryRepository.deleteById(id);
+        return true;
     }
 
     @Override

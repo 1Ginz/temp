@@ -1,6 +1,10 @@
 package bookstore.app.book.dto;
 
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+
 public class BookDto {
     private Long id;
 
@@ -10,11 +14,13 @@ public class BookDto {
 
     private CategoryDto category;
 
-    private String releaseDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private LocalDate releaseDate;
 
     private Double price;
 
     private String imgCover;
+
 
     public BookDto() {
     }
@@ -36,7 +42,7 @@ public class BookDto {
         return this.category;
     }
 
-    public String getReleaseDate() {
+    public LocalDate getReleaseDate() {
         return this.releaseDate;
     }
 
@@ -64,7 +70,7 @@ public class BookDto {
         this.category = category;
     }
 
-    public void setReleaseDate(String releaseDate) {
+    public void setReleaseDate(LocalDate releaseDate) {
         this.releaseDate = releaseDate;
     }
 
