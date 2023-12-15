@@ -64,14 +64,15 @@ public class OrderTotalService implements IOderTotalService {
             item.setOrderTotal(cart);
             item.setQuantity(quantity);
             item.setTotal(BigDecimal.valueOf(item.getQuantity()*item.getBook().getPrice()));
-            item = orderDetailMapper.convertToDto(orderDetailRepository.save(orderDetailMapper.convertToEntity(item)));
-            items.add(item);
+//            item = orderDetailMapper.convertToDto(orderDetailRepository.save(orderDetailMapper.convertToEntity(item)));
+//            items.add(item);
+            cart.addOrderDetails(item);
         } else {
-            int itemQuantity = item.getQuantity() + quantity;
-            item.setQuantity(itemQuantity);
-            orderDetailRepository.save(orderDetailMapper.convertToEntity(item));
+//            int itemQuantity = item.getQuantity() + quantity;
+//            item.setQuantity(itemQuantity);
+//            orderDetailRepository.save(orderDetailMapper.convertToEntity(item));
         }
-        cart.setOrderDetails(items);
+//        cart.setOrderDetails(items);
         cart.setUser(userDto);
         OrderTotal order = orderTotalRepository.save(orderTotalMapper.convertToEntity(cart));
         OrderTotalDto orderTotalDto = orderTotalMapper.convertToDto(order);

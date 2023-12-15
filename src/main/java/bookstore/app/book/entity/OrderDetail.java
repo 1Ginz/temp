@@ -34,7 +34,7 @@ public class OrderDetail {
     @JsonIgnoreProperties(value = {"orderDetails","category","comments"}, allowSetters = true)
     private Book book;
 
-    @ManyToOne(cascade = CascadeType.DETACH, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ordertotal_id",referencedColumnName = "id")
     @JsonIgnoreProperties(value = {"orderDetails","user"},allowSetters = true)
     private OrderTotal orderTotal;

@@ -27,7 +27,7 @@ public class OrderTotal {
     @Column(name = "amount_totail", precision = 21, scale = 2)
     private BigDecimal amountTotal;
 
-    @OneToMany(mappedBy = "orderTotal")
+    @OneToMany(mappedBy = "orderTotal", cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REMOVE}, orphanRemoval = true)
     @JsonIgnoreProperties(value = {"orderTotal","book"},allowSetters = true)
     private Set<OrderDetail> orderDetails;
 
