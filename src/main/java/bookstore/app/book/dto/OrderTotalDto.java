@@ -20,7 +20,13 @@ public class OrderTotalDto {
 
     private UserDto user;
 
+
     private Set<OrderDetailDto> orderDetails;
+
+    public void addOrderDetails(OrderDetailDto orderDetail) {
+        this.orderDetails.add(orderDetail);
+        orderDetail.setOrderTotal(this);
+    }
 
     public OrderTotalDto() {
         this.orderDetails = new LinkedHashSet<>();
